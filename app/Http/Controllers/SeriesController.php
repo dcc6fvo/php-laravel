@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Route;
 use App\Models\Serie;
+use App\Http\Requests\SeriesFormRequest;
 use DB;
 
 class SeriesController extends Controller
 {
     public function index(Request $request)
     {
-        //$series = Serie::all();
         $series = Serie::query()->orderBy('name')->get();
-        return view('series.index')->with('series', $series);
+        $mensagemSucesso = $request->session()->get('mensagem.sucesso');
+        return view('series.index')->with('series', $series)->with('mensagemSucesso', $mensagemSucesso);
     }
 
     public function create()
@@ -20,34 +23,43 @@ class SeriesController extends Controller
         return view('series.create');
     }
 
-    public function store(Request $request)
+    public function store(SeriesFormRequest $request)
     {
-        Serie::create($request->all());        
-        //return to_route('series.index');
+        Serie::create($request->all());
+        $request->session()->flash('mensagem.sucesso', 'Série '.$request->name.' adicionada com sucesso');
         return redirect()->route('series.index');
     }
 
-    public function destroy(Request $request)
+    public function destroy(Serie $series, Request $request)
     {
-        Serie::destroy($request->series);        
+        $series->delete();
+        $request->session()->flash('mensagem.sucesso', 'Série '.$series->name.' removida com sucesso');
         return redirect()->route('series.index');
     }
 
     
-    public function edit(Request $request)
+    public function edit(Serie $series, Request $request)
     {
-        dd($request->series);
-        //Serie::destroy($request->series);        
-        //return to_route('series.index');
-        //return redirect()->route('series.index');
+        return view('series.edit')->with('series',$series);
     }
 
-    /*
+    public function update(Serie $series,SeriesFormRequest $request)
+    {
+        //$series = Serie::where('name', '=', $series->name)->first();
+        //$series->update($request->all());
+        
+        $series->fill($request->all());
+        $series->save();
+
+        $request->session()->flash('mensagem.sucesso', 'Série '.$series->name.' atualizada com sucesso');
+        return redirect()->route('series.index');
+    }
+    
     public function show(Request $request)
     {
         dd($request->series);
-        //Serie::destroy($request->series);        
-        //return to_route('series.index');
-        //return redirect()->route('series.index');
-    }*/
+        //return view('series.edit');
+    }
+    
+
 }
