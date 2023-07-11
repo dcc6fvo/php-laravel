@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SeriesFormRequest;
+use App\Models\Series;
+use App\Repositories\SeriesRepository;
 use Illuminate\Http\Request;
-use App\Models\Serie;
-use DB;
 
 class SeriesController extends Controller
 {
+    public function __construct(private SeriesRepository $repository)
+    {
+    }
+
     public function index(Request $request)
     {
-        //$series = Serie::all();
-        $series = Serie::query()->orderBy('name')->get();
-        return view('series.index')->with('series', $series);
+        
+ 
+        $series = Series::all();
+        $mensagemSucesso = session('mensagem.sucesso');
+
+        return view('series.index')->with('series', $series)
+            ->with('mensagemSucesso', $mensagemSucesso);
+        
     }
 
     public function create()
@@ -20,12 +30,33 @@ class SeriesController extends Controller
         return view('series.create');
     }
 
-    public function store(Request $request)
+    public function store(SeriesFormRequest $request)
     {
-        $nomeSerie = $request->input('name');
-        $serie = new Serie();
-        $serie->name = $nomeSerie;
-        $serie->save();
-        return redirect('/series');
+        $serie = $this->repository->add($request);
+
+        return to_route('series.index')
+            ->with('mensagem.sucesso', "Série '{$serie->nome}' adicionada com sucesso");
+    }
+
+    public function destroy(Series $series)
+    {
+        $series->delete();
+
+        return to_route('series.index')
+            ->with('mensagem.sucesso', "Série '{$series->nome}' removida com sucesso");
+    }
+
+    public function edit(Series $series)
+    {
+        return view('series.edit')->with('serie', $series);
+    }
+
+    public function update(Series $series, SeriesFormRequest $request)
+    {
+        $series->fill($request->all());
+        $series->save();
+
+        return to_route('series.index')
+            ->with('mensagem.sucesso', "Série '{$series->nome}' atualizada com sucesso");
     }
 }
