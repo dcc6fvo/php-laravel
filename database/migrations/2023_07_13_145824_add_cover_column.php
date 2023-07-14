@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSeriesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class CreateSeriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('series', function (Blueprint $table) {
-            $table->id();
-            $table->string('name',128);
-            $table->timestamps();
+        Schema::table('series', function (Blueprint $table) {
+            $table->string('cover')->nullable();
         });
     }
 
@@ -27,6 +25,8 @@ class CreateSeriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('series');
+        Schema::table('series', function (Blueprint $table) {
+            $table->dropColumn('cover');
+        });
     }
-}
+};

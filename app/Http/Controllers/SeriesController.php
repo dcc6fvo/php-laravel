@@ -7,6 +7,12 @@ use App\Models\Series;
 use App\Repositories\SeriesRepository;
 use Illuminate\Http\Request;
 
+use App\Events\SeriesCreatedEvent;
+use App\Events\SeriesDeletedEvent;
+
+use Illuminate\Support\Facades\Log;
+
+
 class SeriesController extends Controller
 {
     public function __construct(private SeriesRepository $repository)
@@ -15,8 +21,6 @@ class SeriesController extends Controller
 
     public function index(Request $request)
     {
-        
- 
         $series = Series::all();
         $mensagemSucesso = session('mensagem.sucesso');
 
@@ -31,17 +35,31 @@ class SeriesController extends Controller
     }
 
     public function store(SeriesFormRequest $request)
-    {
+    {       
+        if($request->hasFile('cover')) {
+            $path = $request->file('cover')->store('files', 'public');
+            $request['coverPath'] = "{$path}";
+        }
+
         $serie = $this->repository->add($request);
 
+        SeriesCreatedEvent::dispatch(
+            $serie->nome,
+            $serie->id,
+            $request->seasonsQty,
+            $request->episodesPerSeason,
+        );
+        
         return to_route('series.index')
             ->with('mensagem.sucesso', "Série '{$serie->nome}' adicionada com sucesso");
     }
 
     public function destroy(Series $series)
     {
-        $series->delete();
-
+        SeriesDeletedEvent::dispatch(
+            $series
+        );
+    
         return to_route('series.index')
             ->with('mensagem.sucesso', "Série '{$series->nome}' removida com sucesso");
     }

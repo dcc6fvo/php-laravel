@@ -22,16 +22,29 @@ use App\Http\Middleware\Autenticador;
 |
 */
 
-Route::get('/', function () {
-    return redirect('/series');
-})->Middleware(Autenticador::class);
+Route::resource('/series', SeriesController::class)
+    ->except(['show']);
 
-Route::resource('/series', SeriesController::class)->except(['show'])->Middleware(Autenticador::class);
+Route::middleware('autenticador')->group(function () {
 
-Route::get('/series/{series}/seasons', [SeasonsController::class, 'index'])->name('seasons.index');
+    Route::get('/', function () {
+        return redirect('/series');
+    }); 
 
-Route::get('/seasons/{season}/episodes', [EpisodesController::class, 'index'])->name('episodes.index');
-Route::post('/seasons/{season}/episodes', [EpisodesController::class, 'update'])->name('episodes.update');
+    Route::get('/series/{series}/seasons', [SeasonsController::class, 'index'])
+        ->name('seasons.index');
+
+    Route::get('/seasons/{season}/episodes', [EpisodesController::class, 'index'])->name('episodes.index');
+    Route::post('/seasons/{season}/episodes', [EpisodesController::class, 'update'])->name('episodes.update');
+
+    Route::get('/email', function () { return new \App\Mail\SeriesCreatedMail(
+        'Série de teste',
+        1,
+        5,
+        10
+    );});
+
+});
 
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'store'])->name('signin');

@@ -8,13 +8,21 @@
                     @auth </a> @endauth
                 
                 @php
-                    if (  $season->numberOfWatchedEpisodes() == $season->episodes->count() )
+                    $count=0;
+                    $allWatched = false;
+                    $partial = false;
+
+                    if ( $season->numberOfWatchedEpisodes() == $season->episodes->count() )
                         $allWatched = true;
                     else
                         $allWatched = false;
+
+                    if ( $season->numberOfWatchedEpisodes() > 0 )
+                        $partial = true;
+
                 @endphp
 
-                <span class="badge @if ($allWatched) bg-success @else bg-secondary @endif">
+                <span class="badge @if ($allWatched) bg-success @elseif ($partial) bg-warning  @else  bg-secondary @endif">
                     {{ $season->numberOfWatchedEpisodes() }} / {{ $season->episodes->count() }}
                 </span>
             </li>

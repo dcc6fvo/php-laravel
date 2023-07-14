@@ -2,10 +2,18 @@
 
 namespace App\Providers;
 
+use App\Events\SeriesCreatedEvent;
+use App\Listeners\EmailUsersAboutSeriesCreated;
+use App\Listeners\SeriesCreatedLog;
+
+use App\Events\SeriesDeletedEvent;
+use App\Listeners\SeriesDeleted;
+use App\Listeners\SeriesDeletedFiles;
+use App\Listeners\SeriesDeletedLog;
+
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,6 +25,13 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        SeriesCreatedEvent::class => [
+            EmailUsersAboutSeriesCreated::class,
+            SeriesCreatedLog::class,
+        ],
+        SeriesDeletedEvent::class => [
+            SeriesDeleted::class,
         ],
     ];
 
