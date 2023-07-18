@@ -20,8 +20,6 @@ class UsersController extends Controller
         $request = $request->only(['name','email','password']);
         $request['password'] = Hash::make($request['password']);
 
-        //dd($request);
-
         $user = User::create($request);
         Auth::login($user);
 

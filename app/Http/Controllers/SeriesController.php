@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 use App\Events\SeriesCreatedEvent;
 use App\Events\SeriesDeletedEvent;
 
-use Illuminate\Support\Facades\Log;
-
-
 class SeriesController extends Controller
 {
     public function __construct(private SeriesRepository $repository)

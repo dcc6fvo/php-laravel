@@ -38,11 +38,8 @@ Route::middleware('autenticador')->group(function () {
     Route::post('/seasons/{season}/episodes', [EpisodesController::class, 'update'])->name('episodes.update');
 
     Route::get('/email', function () { return new \App\Mail\SeriesCreatedMail(
-        'Série de teste',
-        1,
-        5,
-        10
-    );});
+        'Série de teste',1,5,10);
+    });
 
 });
 

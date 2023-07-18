@@ -30,16 +30,16 @@ class SeriesDeleted
 
         if($event->series->delete()){
             Log::info("Série {$event->series->nome} removida com sucesso do banco de dados");
+            $file = $event->series->cover;
+
+            if(isset($file) && file_exists(public_path('storage/'.$file)) ){ 
+                Log::info("Arquivo de imagem da série {$event->series->nome} removido com sucesso.");
+                Storage::disk('public')->delete($file);
+            }else{
+                Log::error("Arquivo de imagem da série {$event->series->nome} não encontrado.");
+            }
         }else{
             Log::error("Erro ao remover série {$event->series->nome} do banco de dados");
-        }
-        
-        $file = $event->series->cover;
-        if(isset($file) && file_exists(public_path('storage/'.$file)) ){ 
-            Log::info("Arquivo de imagem da série {$event->series->nome} removido com sucesso.");
-            Storage::disk('public')->delete($file);
-        }else{
-            Log::error("Arquivo de imagem da série {$event->series->nome} não encontrado.");
         }
     }
 }
